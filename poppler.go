@@ -1,6 +1,6 @@
 package poppler
 
-// #cgo pkg-config: --cflags-only-I poppler-glib
+// #cgo pkg-config: poppler-glib
 // #include <poppler.h>
 // #include <stdlib.h>
 // #include <glib.h>
@@ -14,7 +14,7 @@ import (
 
 type poppDoc *C.struct__PopplerDocument
 
-func Open(filename string) (doc *Document, err error) {	
+func Open(filename string) (doc *Document, err error) {
 	filename, err = filepath.Abs(filename)
 	if err != nil {
 		return
@@ -30,6 +30,22 @@ func Open(filename string) (doc *Document, err error) {
 		doc : d,
 	}
 	return
+}
+
+func LoadFromBytes(buf []byte) (doc *Document, err error) {
+	str := string(buf)
+	p := C.CString(str)
+	var e *C.GError
+	var d poppDoc
+	d = C.poppler_document_new_from_data(p, C.int(len(str)), nil, nil)
+	if e != nil {
+		err = errors.New(C.GoString((*C.char)(e.message)))
+	}
+	doc = &Document{
+		doc : d,
+	}
+	return
+
 }
 
 func Version() string {
