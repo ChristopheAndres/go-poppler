@@ -5,7 +5,7 @@ package poppler
 // #include <glib.h>
 import "C"
 import "unsafe"
-//import "fmt"
+
 
 type Page struct {
 	p *C.struct__PopplerPage
@@ -128,4 +128,17 @@ func (p *Page) TextLayoutAndAttrs() (result []TextEl) {
 		i++
 	}
 	return
+}
+
+func (p *Page) Links() []string {
+        var ret []string
+        gl := C.poppler_page_get_link_mapping(p.p)
+        for el := gl; el != nil; el = el.next {
+                d := el.data
+                act := (poppActionURI)(unsafe.Pointer((poppLinkMap)(d).action))
+                if (act._type == C.POPPLER_ACTION_URI) {
+			ret = append(ret, C.GoString(act.uri))
+		}
+	}
+	return ret
 }

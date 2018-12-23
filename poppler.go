@@ -13,6 +13,9 @@ import (
 )
 
 type poppDoc *C.struct__PopplerDocument
+type poppActionURI *C.struct__PopplerActionUri
+type poppLinkMap *C.struct__PopplerLinkMapping
+
 
 func Open(filename string) (doc *Document, err error) {
 	filename, err = filepath.Abs(filename)
